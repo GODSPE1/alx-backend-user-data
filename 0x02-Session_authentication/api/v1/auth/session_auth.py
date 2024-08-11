@@ -2,6 +2,7 @@
 """This module define the Session Authentication"""
 from api.v1.auth.auth import Auth
 import uuid
+from models.user import User
 
 
 class SessionAuth(Auth):
@@ -29,3 +30,20 @@ class SessionAuth(Auth):
 
         user_id = self.user_id_by_session_id.get(session_id)
         return user_id
+
+    def current_user(self, request=None):
+        """Fetch an istance value based on a cookie value"""
+
+        if request is not None:
+            # retrieves the session ID from the request's cookies
+            extracted_session_id = self.session_cookie(request)
+
+            # retreives user ID associated with that session ID
+            user_id = self.user_id_by_session_id(extracted_session_id)
+
+            # fetches the user from the database using the user ID
+            user = User.get(user_id)
+
+            return user
+
+        return None
