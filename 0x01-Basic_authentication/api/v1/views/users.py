@@ -16,6 +16,17 @@ def view_all_users() -> str:
     return jsonify(all_users)
 
 
+@app_views.route('/users/me', methods=['GET'], strict_slashes=False)
+def retrieve_authenticated_user() -> str:
+    """GET /user/me
+    Return:
+        - return an authenticated user.
+    """
+    if not request.current_user:
+        abort(401)
+    else:
+        return jsonify(request.current_user)
+
 @app_views.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
 def view_one_user(user_id: str = None) -> str:
     """ GET /api/v1/users/:id
@@ -25,12 +36,19 @@ def view_one_user(user_id: str = None) -> str:
       - User object JSON represented
       - 404 if the User ID doesn't exist
     """
-    if user_id is None:
-        abort(404)
     user = User.get(user_id)
-    if user is None:
+    if not user or not user_id:
         abort(404)
-    return jsonify(user.to_json())
+    # return jsonify(user.to_json())
+
+    if user_id == "me" and request.current_user is None:
+        abort(404)
+    
+    if user_id == "me" and request.current_user:
+        return jsonify(user_id, request.current_user)
+    
+    if user:
+        return jsonify(user.to_json())
 
 
 @app_views.route('/users/<user_id>', methods=['DELETE'], strict_slashes=False)

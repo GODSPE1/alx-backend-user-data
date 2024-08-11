@@ -2,8 +2,10 @@
 """
 Auth module for the API
 """
-from flask import request
+
 from typing import List, TypeVar
+import os
+from flask import request
 
 
 class Auth:
@@ -21,7 +23,7 @@ class Auth:
         Returns:
             bool: True if authentication is required, False otherwise.
         """
-        if path is None:
+        if not path:
             return True
         if excluded_paths is None or not excluded_paths:
             return True
@@ -64,3 +66,9 @@ class Auth:
             TypeVar('User'): None (placeholder).
         """
         return None
+
+    def session_cookie(self, request=None):
+        """Fetch the value of the cookie named _my_session_id from request"""
+        if request is not None:
+            cookie_name = os.getenv('SESSION_NAME')
+            return request.cookies.get(cookie_name)
