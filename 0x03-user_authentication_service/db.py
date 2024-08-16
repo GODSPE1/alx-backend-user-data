@@ -43,7 +43,7 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
-    
+
     def find_user_by(self, **kwargs: Dict) -> User:
         """Find a user by email or hashed password"""
         try:
@@ -55,7 +55,7 @@ class DB:
             raise e
         except InvalidRequestError as e:
             raise e
-    
+
     def update_user(self, user_id: int, **kwargs: Dict) -> None:
         """Locate the user by id, update and commit to database
         Parameter:
@@ -65,10 +65,10 @@ class DB:
         Raises: raises value error if invalid attribute is passed
         """
         try:
-            user = find_user_by(id=user_id)
+            user = self.find_user_by(id=user_id)
         except NoResultFound:
             raise ValueError(f"User with id {user_id} not found")
-        
+
         for key, value in kwargs.items():
             if not hasattr(user, key):
                 raise ValueError(f"Invalid attribute: {key}")
