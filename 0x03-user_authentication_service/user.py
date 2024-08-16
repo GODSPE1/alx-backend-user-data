@@ -2,7 +2,7 @@
 """This is a User model using declarative mapping"""
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy import MetaData
 
 metadata = MetaData()
