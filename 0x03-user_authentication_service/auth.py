@@ -63,9 +63,51 @@ class Auth:
         except NoResultFound:
             return None
 
+    def destroy_session(self, session_id: str) -> None:
+        """Destroy the session for a user by setting the session id to None"""
+        user = self._db.find_user_by(session_id)
+        self._db.update_user(user_id, session_id=None)
+        return None
+
+    def get_reset_password_token(self, email: str) -> str:
+        """
+        Generates a password reset token
+
+        Return
+            The reset token
+        """
+
+        try:
+            user = self._db.find_user_by(email=email)
+        except NoResultFound:
+            raise ValueError
+
+        token = self._generate_uuid()
+        self._db.update_user(user.id, reset_token=token)
+
+        return token
+
     def _generate_uuid() -> str:
         """Generate uuid"""
         return str(uuid4())
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """
+        Updates a user's password
+
+        Return
+            None
+        """
+
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+        except NoResultFound:
+            raise ValueError
+
+        hashed_password = self._hash_password(password)
+
+        self._db.update_user(user.id, hashed_password)
+        self._db.update_user(user.id, reset_token=None)
 
     def _hash_password(self, password: str) -> bytes:
         """Return a hashed password using bcrypt"""
